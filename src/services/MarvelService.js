@@ -20,7 +20,6 @@ class MarvelService {
     }
 
     _thransformCharacter = (character) => {
-
         return {
             name: character.name,
             description: character.description ? `${character.description.slice(0, 210)}...` : 'There is no description for this character',
