@@ -33,7 +33,7 @@ class CharInfo extends Component {
             return
         }
 
-        this.onCharLoaded();
+        this.onCharLoading();
 
         this.marvelService
             .getCharacter(charId)
