@@ -21,7 +21,25 @@ class CharList extends Component {
 
     componentDidMount() {
         this.onRequest();
+        window.addEventListener('scroll', this.showRequestScroll);
     }
+
+    componentWillUnmount() {
+        window.removeEventListener('scroll', this.showRequestScroll);
+
+    }
+
+    showRequestScroll = (offset) => {
+        if (this.state.charEnded)
+            window.removeEventListener("scroll", this.onScroll);
+        if (window.scrollY + document.documentElement.clientHeight >= document.documentElement.scrollHeight - 1) {
+            // вызов окна при скроле 
+            this.onRequest(offset);
+
+
+        }
+    }
+
 
     onRequest = (offset) => {
         this.onCharListLoading();
