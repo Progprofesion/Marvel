@@ -31,13 +31,21 @@ class CharList extends Component {
     }
 
     showRequestScroll = (offset) => {
-        if (this.state.charEnded)
+
+
+
+        if (this.state.charEnded) {
             window.removeEventListener("scroll", this.onScroll);
+        }
+
         if (window.scrollY + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
             // вызов окна при скроле 
             this.onRequest(offset);
         }
+
+
     }
+
 
 
     onRequest = (offset) => {
