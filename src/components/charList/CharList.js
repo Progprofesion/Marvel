@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 import Spinner from '../spinner/SpinnerMain';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import MarvelService from '../../services/MarvelService';
@@ -32,11 +33,9 @@ class CharList extends Component {
     showRequestScroll = (offset) => {
         if (this.state.charEnded)
             window.removeEventListener("scroll", this.onScroll);
-        if (window.scrollY + document.documentElement.clientHeight >= document.documentElement.scrollHeight - 1) {
+        if (window.scrollY + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
             // вызов окна при скроле 
             this.onRequest(offset);
-
-
         }
     }
 
@@ -126,6 +125,10 @@ class CharList extends Component {
             </div>
         )
     }
+}
+
+CharList.propTypes = {
+    onCharSelected: PropTypes.func.isRequired
 }
 
 export default CharList;
