@@ -9,13 +9,14 @@ import decoration from '../../resources/img/vision.png';
 
 class App extends Component {
     state = {
-        selectedChar: null
+        selectedChar: null,
     }
 
     onCharSelected = (id) => {
         this.setState({
-            selectedChar: id
+            selectedChar: id,
         })
+
     }
 
     render() {
