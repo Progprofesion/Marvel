@@ -4,7 +4,7 @@ class MarvelService {
     _baseOffset = 210
     getResources = async (url) => {
         const res = await fetch(url)
-        if (!res) {
+        if (!res.ok) {
             throw new Error(`Coluld not fetch ${url}, status: ${res.status}`);
         }
         return await res.json()
