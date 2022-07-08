@@ -5,6 +5,7 @@ import CharInfo from "../charInfo/CharInfo";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 import Search from '../search/Search';
 import decoration from '../../resources/img/vision.png';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 const MainPage = () => {
 
@@ -17,25 +18,35 @@ const MainPage = () => {
 
     return (
         <>
-            <ErrorBoundary>
-                <RandomChar />
-            </ErrorBoundary>
-            <div className="char__content">
-
+            <HelmetProvider>
+                <Helmet>
+                    <meta
+                        name="description"
+                        content="Marvel information portal"
+                    />
+                    <title>Marvel information portal</title>
+                </Helmet>
                 <ErrorBoundary>
-                    <CharList onCharSelected={onCharSelected} />
+                    <RandomChar />
                 </ErrorBoundary>
+                <div className="char__content">
 
-                <div>
                     <ErrorBoundary>
-                        <CharInfo charId={selectedChar} />
+                        <CharList onCharSelected={onCharSelected} />
                     </ErrorBoundary>
-                    <ErrorBoundary>
-                        <Search />
-                    </ErrorBoundary>
+
+                    <div>
+                        <ErrorBoundary>
+                            <CharInfo charId={selectedChar} />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                            <Search />
+                        </ErrorBoundary>
+                    </div>
                 </div>
-            </div>
-            <img className="bg-decoration" src={decoration} alt="vision" />
+                <img className="bg-decoration" src={decoration} alt="vision" />
+            </HelmetProvider>
+
         </>
     )
 }
