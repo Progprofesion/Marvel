@@ -21,7 +21,6 @@ const CharSearchForm = () => {
     const updateChar = (name) => {
         clearError();
 
-
         getCharacterByName(name)
             .then(onCharLoaded);
     }
@@ -37,6 +36,7 @@ const CharSearchForm = () => {
         <div className="char__search-error">
             The character was not found. Check the name and try again
         </div>;
+
 
     return (
         <div className="char__search-form">
@@ -55,21 +55,19 @@ const CharSearchForm = () => {
                     <label className="char__search-label" htmlFor="charName">Or find a character by name:</label>
                     <div className="char__search-wrapper">
                         <Field
-                            id="charName"
+                            id='charName'
                             name='charName'
                             type='text'
-                            placeholder="Enter name" />
-
+                            placeholder='Enter name' />
                         <button
                             type='submit'
                             className="button button__main"
                             disabled={loading}>
                             <div className="inner">find</div>
                         </button>
-                        <FormikErrorMessage component="div" className="char__search-error" name="charName" />
                     </div>
+                    <FormikErrorMessage component='div' className='char__search-error' name='charName' />
                 </Form>
-
             </Formik>
             {results}
             {errorMessage}
