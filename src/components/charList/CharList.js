@@ -3,19 +3,36 @@ import PropTypes from 'prop-types';
 import Spinner from '../spinner/SpinnerMain';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import useMarvelService from '../../services/MarvelService';
+
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './charList.scss';
+
+
+const setContent = (process, Component, newItemLoading) => {
+    switch (process) {
+        case 'waiting':
+            return <Spinner />;
+        case 'loading':
+            return newItemLoading ? <Component /> : <Spinner />;
+        case 'confirmed':
+            return <Component />;
+        case 'error':
+            return <ErrorMessage />;
+        default:
+            throw new Error('Unexpected process state');
+    }
+}
 
 
 const CharList = (props) => {
 
     const [charList, setCharList] = useState([]);
-    const [newItemsLoading, setNewItemsLoading] = useState(false);
+    const [newItemLoading, setNewItemsLoading] = useState(false);
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
 
 
-    const { loading, error, getAllCharacters } = useMarvelService();
+    const { getAllCharacters, process, setProcess } = useMarvelService();
 
     useEffect(() => {
         onRequest(offset, true);
@@ -54,6 +71,7 @@ const CharList = (props) => {
         initial ? setNewItemsLoading(false) : setNewItemsLoading(true);
         getAllCharacters(offset)
             .then(onCharListLoaded)
+            .then(() => setProcess('confirmed'))
     }
 
     const onCharListLoaded = (newCharList) => {
@@ -63,7 +81,7 @@ const CharList = (props) => {
         }
 
         setCharList(charlist => [...charList, ...newCharList]);
-        setNewItemsLoading(newItemsLoading => false);
+        setNewItemsLoading(newItemLoading => false);
         setOffset(offset => offset + 9);
         setCharEnded(charEnded => ended)
     }
@@ -117,20 +135,12 @@ const CharList = (props) => {
     }
 
 
-
-    const items = renderItems(charList)
-
-    const errorMessage = error ? <ErrorMessage /> : null;
-    const spinner = loading && !newItemsLoading ? <Spinner /> : null;
-
     return (
         <div className="char__list">
-            {errorMessage}
-            {spinner}
-            {items}
+            {setContent(process, () => renderItems(charList), newItemLoading)}
             <button
                 className="button button__main button__long"
-                disabled={newItemsLoading}
+                disabled={newItemLoading}
                 style={{ 'display': charEnded ? 'none' : 'block' }}
                 onClick={() => { onRequest(offset) }}>
                 <div className="inner">load more</div>
