@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Spinner from '../spinner/SpinnerMain';
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -27,10 +27,9 @@ const setContent = (process, Component, newItemLoading) => {
 const CharList = (props) => {
 
     const [charList, setCharList] = useState([]);
-    const [newItemLoading, setNewItemsLoading] = useState(false);
+    const [newItemLoading, setnewItemLoading] = useState(false);
     const [offset, setOffset] = useState(210);
     const [charEnded, setCharEnded] = useState(false);
-
 
     const { getAllCharacters, process, setProcess } = useMarvelService();
 
@@ -39,63 +38,33 @@ const CharList = (props) => {
         // eslint-disable-next-line
     }, [])
 
-    // componentDidMount() {
-    //     this.onRequest();
-    //     window.addEventListener('scroll', this.showRequestScroll);
-    // }
-
-    // componentWillUnmount() {
-    //     window.removeEventListener('scroll', this.showRequestScroll);
-
-    // }
-
-    // showRequestScroll = (offset) => {
-
-
-
-    //     if (this.state.charEnded) {
-    //         window.removeEventListener("scroll", this.onScroll);
-    //     }
-
-    //     if (window.scrollY + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
-    //         // вызов окна при скроле 
-    //         this.onRequest(offset);
-    //     }
-
-
-    // }
-
-
-
     const onRequest = (offset, initial) => {
-        initial ? setNewItemsLoading(false) : setNewItemsLoading(true);
+        initial ? setnewItemLoading(false) : setnewItemLoading(true);
         getAllCharacters(offset)
             .then(onCharListLoaded)
-            .then(() => setProcess('confirmed'))
+            .then(() => setProcess('confirmed'));
     }
 
-    const onCharListLoaded = (newCharList) => {
+    const onCharListLoaded = async (newCharList) => {
         let ended = false;
         if (newCharList.length < 9) {
             ended = true;
         }
-
-        setCharList(charlist => [...charList, ...newCharList]);
-        setNewItemsLoading(newItemLoading => false);
-        setOffset(offset => offset + 9);
-        setCharEnded(charEnded => ended)
+        setCharList([...charList, ...newCharList]);
+        setnewItemLoading(false);
+        setOffset(offset + 9);
+        setCharEnded(ended);
     }
 
     const itemRefs = useRef([]);
 
-    const focusitem = (id) => {
+    const focusOnItem = (id) => {
         itemRefs.current.forEach(item => item.classList.remove('char__item_selected'));
         itemRefs.current[id].classList.add('char__item_selected');
-        itemRefs.current[id].focus()
-
+        itemRefs.current[id].focus();
     }
 
-    function renderItems(arr) {
+    const renderItems = arr => {
         const items = arr.map((item, i) => {
             let imgStyle = { 'objectFit': 'cover' };
             if (item.thumbnail === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg') {
@@ -103,19 +72,19 @@ const CharList = (props) => {
             }
 
             return (
-                <CSSTransition key={item.id} classNames="char__item" timeout={500}>
-                    <li tabIndex={0}
+                <CSSTransition key={item.id} timeout={500} classNames="char__item">
+                    <li
                         className="char__item"
-                        key={item.id}
+                        tabIndex={0}
                         ref={el => itemRefs.current[i] = el}
                         onClick={() => {
                             props.onCharSelected(item.id);
-                            focusitem(i)
+                            focusOnItem(i);
                         }}
                         onKeyPress={(e) => {
                             if (e.key === ' ' || e.key === "Enter") {
                                 props.onCharSelected(item.id);
-                                focusitem(i);
+                                focusOnItem(i);
                             }
                         }}>
                         <img src={item.thumbnail} alt={item.name} style={imgStyle} />
@@ -134,21 +103,26 @@ const CharList = (props) => {
         )
     }
 
+    const elements = useMemo(() => {
+        return setContent(process, () => renderItems(charList), newItemLoading);
+        // eslint-disable-next-line
+    }, [process])
 
+    // TransitionGroup работать не будет за счет постоянного пересоздания компонента
+    // разбор в следующем уроке
     return (
         <div className="char__list">
-            {setContent(process, () => renderItems(charList), newItemLoading)}
+            {elements}
             <button
-                className="button button__main button__long"
                 disabled={newItemLoading}
                 style={{ 'display': charEnded ? 'none' : 'block' }}
-                onClick={() => { onRequest(offset) }}>
+                className="button button__main button__long"
+                onClick={() => onRequest(offset)}>
                 <div className="inner">load more</div>
             </button>
         </div>
     )
 }
-
 
 CharList.propTypes = {
     onCharSelected: PropTypes.func.isRequired
